@@ -1,0 +1,133 @@
+ package bai7;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class BattleCity {
+	static int T;
+	static int row;
+	static int col;
+	static int[][] arr =new int[301][301];
+	static int[][] visited =new int[301][301];
+	static int x1,y1,x2,y2;
+	static int[] queueX = new int[10000000];
+	static int[] queueY = new int[10000000];
+	static int font,rear;
+	static int[] dx = {-1,0,0,1};
+	static int[] dy ={0,-1,1,0};
+	
+	public static void inra(){
+		System.out.println();
+		for (int i = 0; i <row; i++) {
+			for (int j = 0; j <col; j++) {
+				System.out.print(arr[i][j]+" ");
+			}
+			System.out.println();
+		}
+	}
+	public static void inVisited(){
+		System.out.println();
+		for (int i = 0; i <row; i++) {
+			for (int j = 0; j <col; j++) {
+				System.out.print(visited[i][j]+" ");
+			}
+			System.out.println();
+		}
+	}
+	
+	public static void reset(){
+		for (int i = 0; i <row; i++) {
+			for (int j = 0; j <col; j++) {
+				visited[i][j]=0;
+			}
+		}
+	}
+	public static boolean checkBao(int x,int y){
+		if (x>=0&&x<row&&y>=0&&y<col) {
+			return true;
+		}
+		return false;
+	}
+	public static void bfs(int a, int b){
+		font =rear =0;
+		queueX[rear]= a;
+		queueY[rear]=b;
+		rear++;
+		boolean check =true;
+		while(font!=rear){
+			int tempX= queueX[font];
+			int tempY=queueY[font];
+			font++;
+			for (int i = 0; i < 4; i++) {
+				int xx = tempX +dx[i];
+				int yy = tempY +dy[i];
+				if (checkBao(xx, yy)&&arr[xx][yy]>0) {
+					if (visited[xx][yy]==0) {
+						visited[xx][yy]=visited[tempX][tempY]+arr[xx][yy];
+						queueX[rear]=xx;
+						queueY[rear]=yy;
+						rear++;
+					}else{
+						int cur= visited[tempX][tempY]+arr[xx][yy];
+						if (cur<visited[xx][yy]) {
+							visited[xx][yy]=cur;
+							queueX[rear]=xx;
+							queueY[rear]=yy;
+							rear++;
+						}
+					}
+					
+				}
+			}
+		}
+	}
+	
+	public static void main(String[] args) throws FileNotFoundException{
+		System.setIn(new FileInputStream("src/input.txt"));
+		Scanner scanner = new Scanner(System.in);
+		T =scanner.nextInt();
+		for (int tc = 1; tc <= T; tc++) {
+			row = scanner.nextInt();
+			col = scanner.nextInt();
+			reset();
+			for (int i = 0; i <row; i++) {
+				String line =scanner.next();
+				for (int j = 0; j <col; j++) {
+					switch (line.charAt(j)) {
+					case 'Y':
+						arr[i][j]=0;
+						x1=i;y1=j;
+						break;
+					case 'T':
+						arr[i][j]=1;
+						x2=i;y2=j;
+						break;
+					case 'E':
+						arr[i][j]=1;
+						break;
+					case 'R':
+						arr[i][j]=-1;
+						break;
+					case 'B':
+						arr[i][j]=2;
+						break;
+					case 'S':
+						arr[i][j]=-1;
+						break;
+					default:
+						break;
+					}
+				}
+			}	
+			bfs(x1,y1);
+			if (visited[x2][y2]==0) {
+				System.out.println("Case #"+tc);
+				System.out.println(-1);
+				continue;
+			}
+			System.out.println("Case #"+tc);
+			System.out.println(visited[x2][y2]);
+		}
+	}
+}
